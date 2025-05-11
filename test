@@ -1,0 +1,1216 @@
+# import libraries
+from contextlib import nullcontext
+from random import Random
+
+import numpy as np
+import matplotlib.pyplot as plt
+import random
+import copy
+import matplotlib.colors as mcolors
+from tkinter import ttk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+import time
+import tkinter as tk
+##################################################################################################################################################
+# variables
+############
+y = 1
+NUM_DAYS = 5
+NUM_HOURS = 10
+random_seed = 123 # TO make the random static
+Doctors_dataset = [
+    "Dr. Elena Morales",
+    "Dr. Raj Patel",
+    "Dr. Sofia Ivanova",
+    "Dr. Kwame Adebayo",
+    "Dr. Mei Chen}",
+    "Dr. Luca Ferrari",
+    "Dr. Amina Al-Farsi",
+    "Dr. Hiroshi Tanaka",
+    "Dr. Nadia Petrov",
+    "Dr. Carlos Silva",
+    "Dr. Anika Varma",
+    "Dr. Youssef Khalid",
+    "Dr. Ingrid Bergman",
+    "Dr. Javier Ruiz",
+    "Dr. Leila Nguyen",
+    "Dr. Viktor Novak",
+    "Dr. Zara Cohen",
+    "Dr. Kenji Nakamura",
+    "Dr. Amara Singh",
+    "Dr. Matteo Ricci",
+    "Dr. Fatima Zahra",
+    "Dr. Nikolai Volkov",
+    "Dr. Priya Deshpande",
+    "Dr. Elias Schmidt",
+    "Dr. Yara Hussein",
+    "Dr. Marco De Luca",
+    "Dr. Anya Kowalski",
+    "Dr. Ravi Shankar",
+    "Dr. Lina Costa",
+    "Dr. Idris Bello",
+    "Dr. Clara Moulin",
+    "Dr. Omar Farooq",
+    "Dr. Saskia Van Dijk",
+    "Dr. Arjun Kapoor",
+    "Dr. Esra Demir",
+    "Dr. Nathan Brooks",
+    "Dr. Amirah Hassan",
+    "Dr. Pavel Horák",
+    "Dr. Linh Tran",
+    "Dr. Björn Eriksson",
+    "Dr. Catalina Mendez",
+    "Dr. Kofi Mensah",
+    "Dr. Elin Johansson",
+    "Dr. Dante Russo",
+    "Dr. Nia Okeke",
+    "Dr. Viktor Petrov",
+    "Dr. Mariam Abdallah",
+    "Dr. Emre Yilmaz",
+    "Dr. Parvati Devi",
+    "Dr. Alejandro Cruz"
+]
+courses_dataset = [
+    # Core Python Programming
+    "Python Syntax and Basic Programming",
+    "Object-Oriented Programming (OOP) in Python",
+    "Functional Programming with Python",
+    "Error Handling and Debugging",
+    "Python Memory Management",
+    "Multithreading and Multiprocessing",
+    "Python Generators and Iterators",
+    "File Handling and I/O Operations",
+    "Regular Expressions in Python",
+    "Python Decorators and Context Managers",
+
+    # Data Structures & Algorithms
+    "Arrays, Lists, and Tuples",
+    "Linked Lists and Trees in Python",
+    "Stacks, Queues, and Deques",
+    "Hash Tables and Dictionaries",
+    "Graphs and Graph Algorithms (BFS/DFS)",
+    "Sorting and Searching Algorithms",
+    "Dynamic Programming in Python",
+    "Greedy Algorithms and Optimization",
+    "Recursion and Backtracking",
+    "Big O Notation and Complexity Analysis",
+
+    # AI & Machine Learning Basics
+    "Introduction to Machine Learning with Scikit-learn",
+    "Supervised Learning (Regression, Classification)",
+    "Unsupervised Learning (Clustering, PCA)",
+    "Linear and Logistic Regression from Scratch",
+    "Decision Trees and Random Forests",
+    "Support Vector Machines (SVM)",
+    "K-Nearest Neighbors (KNN)",
+    "Ensemble Methods (Bagging, Boosting)",
+    "Model Evaluation (Accuracy, Precision, ROC-AUC)",
+    "Hyperparameter Tuning (Grid Search, Random Search)",
+
+    # Deep Learning & Neural Networks
+    "Introduction to TensorFlow and Keras",
+    "Feedforward Neural Networks",
+    "Convolutional Neural Networks (CNNs)",
+    "Recurrent Neural Networks (RNNs)",
+    "Long Short-Term Memory (LSTM) Networks",
+    "Transfer Learning with Pre-trained Models",
+    "Autoencoders and Generative Models",
+    "Reinforcement Learning Basics (Q-Learning)",
+    "Natural Language Processing (NLP) with Transformers",
+    "PyTorch Fundamentals",
+
+    # Data Science & Analysis
+    "Data Cleaning with Pandas",
+    "Exploratory Data Analysis (EDA)",
+    "Data Visualization with Matplotlib/Seaborn",
+    "Statistical Analysis with SciPy",
+    "Time Series Analysis (ARIMA, Prophet)",
+    "Feature Engineering and Selection",
+    "Handling Missing Data",
+    "Dimensionality Reduction (t-SNE, UMAP)",
+    "Working with SQL Databases (SQLite, PostgreSQL)",
+    "Big Data Tools (PySpark, Dask)",
+
+    # Natural Language Processing (NLP)
+    "Text Preprocessing (Tokenization, Stemming)",
+    "Sentiment Analysis with NLTK",
+    "Named Entity Recognition (NER)",
+    "Topic Modeling (LDA, LSA)",
+    "Word Embeddings (Word2Vec, GloVe)",
+    "BERT and Transformer Models",
+    "Text Summarization",
+    "Chatbot Development with Rasa",
+    "Speech Recognition (Speech-to-Text)",
+    "Language Translation with Seq2Seq Models",
+
+    # Computer Vision
+    "Image Processing with OpenCV",
+    "Edge Detection and Filters",
+    "Object Detection (YOLO, Faster R-CNN)",
+    "Image Segmentation (Mask R-CNN)",
+    "Facial Recognition Systems",
+    "Optical Character Recognition (OCR)",
+    "Video Analysis with FFmpeg",
+    "Generative Adversarial Networks (GANs)",
+    "Image Captioning",
+    "Augmented Reality (AR) with Python",
+
+    # Advanced AI & Research
+    "Bayesian Networks and Probabilistic Models",
+    "Monte Carlo Methods",
+    "Evolutionary Algorithms (Genetic Algorithms)",
+    "Swarm Intelligence (Particle Swarm Optimization)",
+    "Explainable AI (XAI)",
+    "Federated Learning",
+    "Quantum Machine Learning",
+    "AI for Game Playing (AlphaZero, Minimax)",
+    "Meta-Learning and Few-Shot Learning",
+    "AI Ethics and Bias Mitigation",
+
+    # Software Engineering & Development
+    "Building REST APIs with Flask/Django",
+    "Web Scraping with Beautiful Soup and Scrapy",
+    "GUI Development (Tkinter, PyQt)",
+    "Unit Testing with PyTest",
+    "Version Control (Git/GitHub)",
+    "Software Design Patterns",
+    "Microservices Architecture",
+    "DevOps for Python (CI/CD Pipelines)",
+    "Packaging and Distributing Python Libraries",
+    "Database Design with SQLAlchemy",
+
+    # Robotics & Automation
+    "Robot Simulation with PyBullet",
+    "Path Planning Algorithms (A*, Dijkstra)",
+    "Control Systems (PID Controllers)",
+    "ROS (Robot Operating System) Basics",
+    "IoT Automation with Raspberry Pi",
+    "Autonomous Drone Programming",
+    "Sensor Data Processing",
+    "Swarm Robotics",
+    "Computer Vision for Robotics",
+    "Reinforcement Learning for Robotics",
+
+    # Specialized Applications
+    "Bioinformatics with Biopython",
+    "Financial Modeling and Algorithmic Trading",
+    "Healthcare AI (Medical Image Analysis)",
+    "Recommendation Systems",
+    "Fraud Detection Systems",
+    "Climate Modeling with Python",
+    "Social Network Analysis",
+    "Music Generation with AI",
+    "Sports Analytics",
+    "Blockchain Development (Smart Contracts)",
+
+    # Deployment & Scaling
+    "Dockerizing Python Applications",
+    "Cloud Deployment (AWS, Azure, GCP)",
+    "Serverless Computing (AWS Lambda)",
+    "Model Serving with TensorFlow Serving",
+    "Real-Time Inference with FastAPI",
+    "Distributed Computing with Celery",
+    "Load Testing and Optimization",
+    "MLOps (Machine Learning Operations)",
+    "Monitoring AI Models in Production",
+    "Edge AI (Deploying Models on Devices)",
+
+    # Mathematics for AI/CS
+    "Linear Algebra for Machine Learning",
+    "Calculus for Gradient Descent",
+    "Probability and Statistics",
+    "Discrete Mathematics",
+    "Numerical Methods in Python",
+    "Optimization Techniques (Gradient Descent)",
+    "Graph Theory Applications",
+    "Cryptography Basics",
+    "Game Theory",
+    "Information Theory",
+
+    # Emerging Trends
+    "AI for Metaverse Development",
+    "Low-Code AI Platforms",
+    "TinyML (Machine Learning on Microcontrollers)",
+    "AI-Driven Cybersecurity",
+    "Neural Architecture Search (NAS)",
+    "AI in Agriculture",
+    "AI for Disaster Response",
+    "Synthetic Data Generation",
+    "AI in Space Exploration",
+    "Ethical Hacking with Python",
+
+    # Projects & Case Studies
+    "Building a Self-Driving Car Simulator",
+    "COVID-19 Data Analysis and Prediction",
+    "Fake News Detection System",
+    "Stock Price Prediction with LSTM",
+    "Handwritten Digit Recognition (MNIST)",
+    "Real-Time Emotion Detection",
+    "AI-Powered Chess Engine",
+    "Voice Assistant (Like Siri/Alexa)",
+    "Predictive Maintenance for IoT Devices",
+    "Personalized Learning Recommendation System"
+] #150
+list_course = courses_dataset.copy()
+NUM_LECTURE_HALLS = 5
+NUM_LAB_ROOMS = 3
+while y == 1 :
+                NUM_COURSES = int(input("Enter the number of COURSES (MAX "+str(NUM_HOURS * NUM_DAYS * 2)+") : "))
+                if NUM_COURSES < 0 or NUM_COURSES is None :
+                    print("Invalid Input")
+                    continue
+                elif NUM_COURSES > (NUM_HOURS * NUM_DAYS * 2)  :
+                    print("too much for the course")
+                    continue
+                else:
+                    NUM_LECTURERS = int(input("Enter the number of LECTURES (Max "+str(int(NUM_COURSES / 2))+") : "))
+                    if NUM_LECTURERS < 0 or NUM_LECTURERS is None :
+                        print("Invalid Input")
+                        continue
+                    elif NUM_LECTURERS > len(Doctors_dataset)    :
+                        print("too much for the course")
+                        continue
+                    else:
+                        NUM_STUDENT_GROUPS = int(input("Enter the number of STUDENT_GROUPS : "))
+                        if NUM_STUDENT_GROUPS < 0 or NUM_STUDENT_GROUPS is None:
+                            print("Invalid Input")
+                            continue
+                        else:
+                            POPULATION_SIZE = int(input("Enter the population size : "))
+                            if POPULATION_SIZE < 0 or POPULATION_SIZE is None:
+                                print("Invalid Input")
+                                continue
+                            elif POPULATION_SIZE > 1000:
+                                print("too much for the population size")
+                                continue
+                            else:
+                                MAX_ITERATIONS = int(input("Enter the number of iterations : "))
+                                if MAX_ITERATIONS < 0 or MAX_ITERATIONS is None:
+                                    print("Invalid Input")
+                                    continue
+                                else:
+                                    break
+MAX_SECTIONS_PER_COURSE = 3
+W = 0.729
+C1 = 1.49
+C2 = 1.49
+CROSSOVER_RATE = 0.8
+MUTATION_RATE = 0.2
+TOURNAMENT_SIZE = 3
+random.seed(random_seed)
+#################################################################################################################################################################################################################################
+# ROOM
+############
+class Room:
+    def __init__(self, id, capacity, room_type , has_projector=False, has_computers=False):
+        self.id = id
+        self.capacity = capacity
+        self.room_type = room_type
+        self.has_projector = has_projector
+        self.has_computers = has_computers
+
+    def __str__(self):
+        return f"Room {self.id} ({self.room_type.capitalize()}, Cap: {self.capacity})"
+#################################################################################################################################################################################################################################
+# Course
+############
+class Course:
+    def __init__(self, id, name, lecturer_id, student_group_ids, duration=1,requires_projector=False, requires_computers=False, min_capacity=0,has_lab=False, num_sections=1):
+        self.id = id
+        self.name = courses_dataset[random.randint(0,(len(courses_dataset)-1))]
+        courses_dataset.remove(self.name)
+        self.lecturer_id = lecturer_id
+        self.student_group_ids = student_group_ids
+        self.duration = duration  # In hours
+        self.requires_projector = requires_projector
+        self.requires_computers = requires_computers
+        self.min_capacity = min_capacity
+        self.has_lab = has_lab  # Whether this course has a lab component
+        self.num_sections = min(num_sections, MAX_SECTIONS_PER_COURSE)  # Number of sections for this course
+
+    def __str__(self):
+        return f"{self.name} (ID: {self.id}, Sections: {self.num_sections}{', with lab' if self.has_lab else ''})"
+#################################################################################################################################################################################################################################
+# Lecturer
+############
+class Lecturer:
+    def __init__(self, id, name, availability=None, courses=None):
+        self.id = id
+        self.name = Doctors_dataset[random.randint(0, len(Doctors_dataset)-1)]
+        Doctors_dataset.remove(self.name)
+        self.courses = courses if courses is not None else []
+        self.courses_name = courses if courses is not None else []
+        if availability is None:
+            self.availability = np.ones((NUM_DAYS, NUM_HOURS), dtype=bool)
+        else:
+            self.availability = availability
+
+        i = 0
+        while i < 2:
+            course_name = list_course[random.randint(0,(len(list_course)-1))]
+            self.courses_name.append(course_name)
+            list_course.remove(course_name)
+            i += 1
+
+    def assign_course(self, course_id):
+        if course_id not in self.courses:
+            self.courses.append(course_id)
+
+    def remove_course(self, course_id):
+        if course_id in self.courses:
+            self.courses.remove(course_id)
+
+    def __str__(self):
+        courses_str = " || ".join(map(str, self.courses_name))
+        return f"Lecturer {self.name} (ID: {self.id}, Courses: [{courses_str}])"
+#################################################################################################################################################################################################################################
+# Student Group
+############
+class StudentGroup:
+    def __init__(self, id, size, name=None):
+        self.id = id
+        self.size = size
+        self.name = name if name else f"Group {self.id}"
+
+    def __str__(self):
+        return f"{self.name} (Size: {self.size})"
+#################################################################################################################################################################################################################################
+# Time
+############
+class TimeSlot:
+    def __init__(self, day, hour):
+        self.day = day
+        self.hour = hour
+
+    def __str__(self):
+        days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"]
+        return f"{days[self.day]} at {self.hour + 8}:00"
+
+    def __eq__(self, other):
+        if not isinstance(other, TimeSlot):
+            return False
+        return self.day == other.day and self.hour == other.hour
+#################################################################################################################################################################################################################################
+# Course Assignment
+############
+class CourseAssignment:
+    def __init__(self, course_id, section_id, room_id, time_slot, is_lab=False):
+        self.course_id = course_id
+        self.section_id = section_id
+        self.room_id = room_id
+        self.time_slot = time_slot
+        self.is_lab = is_lab
+
+    def __str__(self):
+        session_type = "Lab" if self.is_lab else "Lecture"
+        return f"Course {self.course_id}-{self.section_id} ({session_type}) in Room {self.room_id} at {self.time_slot}"
+#################################################################################################################################################################################################################################
+# Time Table
+############
+class Timetable:
+    def __init__(self, assignments=None):
+        self.assignments = assignments if assignments else []
+        self.fitness = 0
+        self.violations = {}
+
+    def add_assignment(self, assignment):
+        self.assignments.append(assignment)
+
+    def get_course_assignments(self, course_id, section_id=None):
+        if section_id is not None:
+            return [a for a in self.assignments if a.course_id == course_id and a.section_id == section_id]
+        return [a for a in self.assignments if a.course_id == course_id]
+
+    def __str__(self):
+        result = "Timetable:\n"
+        for assignment in sorted(self.assignments, key=lambda x: (x.time_slot.day, x.time_slot.hour)):
+            result += f"  {assignment}\n"
+        return result
+#################################################################################################################################################################################################################################
+# Particle
+############
+class Particle:
+    def __init__(self, position=None, velocity=None):
+        self.position = position if position else Timetable()
+        self.velocity = velocity if velocity else []
+        self.best_position = copy.deepcopy(self.position)
+        self.best_fitness = float('-inf')
+
+    def update_personal_best(self):
+        if self.position.fitness > self.best_fitness:
+            self.best_position = copy.deepcopy(self.position)
+            self.best_fitness = self.position.fitness
+#################################################################################################################################################################################################################################
+# University Timetabling Problem
+############
+class UniversityTimetablingProblem:
+    def __init__(self):
+        self.rooms = self.generate_rooms()
+        self.lecturers = self.generate_lecturers()
+        self.student_groups = self.generate_student_groups()
+        self.courses = self.generate_courses()
+        self.global_best_position = None
+        self.global_best_fitness = float('-inf')
+        self.avg_fitness_history = []
+        self.best_fitness_history = []
+        self.violation_history = []
+
+    def generate_rooms(self):
+        rooms = []
+        for i in range(NUM_LECTURE_HALLS):
+            capacity = random.randint(30, 120)
+            has_projector = random.random() > 0.1
+            has_computers = random.random() > 0.8
+            rooms.append(Room(i, capacity, "lecture", has_projector, has_computers))
+
+        for i in range(NUM_LECTURE_HALLS, NUM_LECTURE_HALLS + NUM_LAB_ROOMS):
+            capacity = random.randint(15, 30)
+            has_projector = random.random() > 0.5
+            has_computers = True
+            rooms.append(Room(i, capacity, "lab", has_projector, has_computers))
+        return rooms
+
+    def generate_lecturers(self):
+        lecturers = []
+        for i in range(NUM_LECTURERS):
+            availability = np.ones((NUM_DAYS, NUM_HOURS), dtype=bool)
+            for d in range(NUM_DAYS):
+                for h in range(NUM_HOURS):
+                    if random.random() < 0.1:
+                        availability[d, h] = False
+            lecturers.append(Lecturer(i, f"Prof. {i}", availability))
+        return lecturers
+
+    def generate_student_groups(self):
+        groups = []
+        for i in range(NUM_STUDENT_GROUPS):
+            size = random.randint(15, 50)
+            groups.append(StudentGroup(i, size))
+        return groups
+
+    def generate_courses(self):
+        courses = []
+        for i in range(NUM_COURSES):
+            lecturer_id = random.randint(0, NUM_LECTURERS - 1 )
+            num_groups = random.randint(1, 3)
+            student_group_ids = random.sample(range(NUM_STUDENT_GROUPS), num_groups)
+            duration = random.choice([1, 2])
+            requires_projector = random.random() > 0.5
+            requires_computers = random.random() > 0.7
+            min_capacity = sum(self.student_groups[g_id].size for g_id in student_group_ids)
+            has_lab = random.random() < 0.3
+            num_sections = random.randint(1, MAX_SECTIONS_PER_COURSE)
+            course_name = f"Course-{i}"
+            courses.append(Course(i, course_name, lecturer_id, student_group_ids,duration, requires_projector, requires_computers,min_capacity, has_lab, num_sections))
+        return courses
+
+    def evaluate_timetable(self, timetable):
+        violations = {
+            'room_conflict': 0,
+            'lecturer_conflict': 0,
+            'student_conflict': 0,
+            'room_capacity': 0,
+            'equipment_mismatch': 0,
+            'lecturer_unavailable': 0,
+            'room_type_mismatch': 0,
+            'missing_lab_sessions': 0,
+            'missing_lecture_sessions': 0
+        }
+        if not timetable.assignments:
+            for course in self.courses:
+                for section in range(course.num_sections):
+                    violations['missing_lecture_sessions'] += 1
+                    if course.has_lab:
+                        violations['missing_lab_sessions'] += 1
+            penalties = {
+                'room_conflict': 100,
+                'lecturer_conflict': 100,
+                'student_conflict': 100,
+                'room_capacity': 50,
+                'equipment_mismatch': 30,
+                'lecturer_unavailable': 70,
+                'room_type_mismatch': 80,
+                'missing_lab_sessions': 60,
+                'missing_lecture_sessions': 150
+            }
+            total_penalty = sum(violations[v] * penalties[v] for v in violations)
+            fitness = 10000 - total_penalty
+            timetable.fitness = fitness
+            timetable.violations = violations
+            return fitness, violations
+
+        course_sections = {}
+        for course in self.courses:
+            for section in range(course.num_sections):
+                course_sections[(course.id, section)] = {'lecture': False, 'lab': False}
+        for i, a1 in enumerate(timetable.assignments):
+            course1 = self.courses[a1.course_id]
+            room1 = self.rooms[a1.room_id]
+            if a1.is_lab:
+                course_sections[(a1.course_id, a1.section_id)]['lab'] = True
+            else:
+                course_sections[(a1.course_id, a1.section_id)]['lecture'] = True
+            if a1.is_lab and room1.room_type != "lab":
+                violations['room_type_mismatch'] += 1
+            elif not a1.is_lab and room1.room_type != "lecture":
+                violations['room_type_mismatch'] += 1
+            if room1.capacity < course1.min_capacity:
+                violations['room_capacity'] += 1
+            if course1.requires_projector and not room1.has_projector:
+                violations['equipment_mismatch'] += 1
+            if course1.requires_computers and not room1.has_computers:
+                violations['equipment_mismatch'] += 1
+            lecturer = self.lecturers[course1.lecturer_id]
+            if not lecturer.availability[a1.time_slot.day, a1.time_slot.hour]:
+                violations['lecturer_unavailable'] += 1
+            for j, a2 in enumerate(timetable.assignments):
+                if i != j:
+                    course2 = self.courses[a2.course_id]
+                    if a1.time_slot.day == a2.time_slot.day and a1.time_slot.hour == a2.time_slot.hour:
+                        if a1.room_id == a2.room_id:
+                            violations['room_conflict'] += 1
+                        if course1.lecturer_id == course2.lecturer_id:
+                            violations['lecturer_conflict'] += 1
+                        if any(g_id in course1.student_group_ids for g_id in course2.student_group_ids):
+                            violations['student_conflict'] += 1
+        for (course_id, section), scheduled in course_sections.items():
+            course = self.courses[course_id]
+            if course.has_lab and not scheduled['lab']:
+                violations['missing_lab_sessions'] += 1
+            if not scheduled['lecture']:
+                violations['missing_lecture_sessions'] += 1
+        penalties = {
+            'room_conflict': 100,
+            'lecturer_conflict': 100,
+            'student_conflict': 100,
+            'room_capacity': 50,
+            'equipment_mismatch': 30,
+            'lecturer_unavailable': 70,
+            'room_type_mismatch': 80,
+            'missing_lab_sessions': 60,
+            'missing_lecture_sessions': 150
+        }
+        total_penalty = sum(violations[v] * penalties[v] for v in violations)
+        fitness = 10000 - total_penalty
+        timetable.fitness = fitness
+        timetable.violations = violations
+        return fitness, violations
+
+    def generate_random_timetable(self):
+        timetable = Timetable()
+        for course in self.courses:
+            for section in range(course.num_sections):
+                self.assign_random_session(timetable, course, section, is_lab=False)
+                if course.has_lab:
+                    self.assign_random_session(timetable, course, section, is_lab=True)
+        self.evaluate_timetable(timetable)
+        return timetable
+
+    def assign_random_session(self, timetable, course, section, is_lab):
+        suitable_rooms = [r for r in self.rooms if (r.room_type == "lab" if is_lab else r.room_type == "lecture")]
+        if not suitable_rooms:
+            return
+        room_id = random.choice(suitable_rooms).id
+        day = random.randint(0, NUM_DAYS - 1)
+        hour = random.randint(0, NUM_HOURS - 1)
+        time_slot = TimeSlot(day, hour)
+        assignment = CourseAssignment(course.id, section, room_id, time_slot, is_lab)
+        timetable.add_assignment(assignment)
+
+    def initialize_pso(self, num_particles):
+        particles = []
+        for _ in range(num_particles):
+            timetable = self.generate_random_timetable()
+            particle = Particle(position=timetable)
+            particle.best_position = copy.deepcopy(timetable)
+            particle.best_fitness = timetable.fitness
+            if timetable.fitness > self.global_best_fitness:
+                self.global_best_position = copy.deepcopy(timetable)
+                self.global_best_fitness = timetable.fitness
+            particles.append(particle)
+        return particles
+
+    def get_timetable_difference(self, timetable1, timetable2):
+        differences = []
+        for i, assignment1 in enumerate(timetable1.assignments):
+            assignment2 = timetable2.assignments[i]
+            if (assignment1.room_id != assignment2.room_id or
+                    assignment1.time_slot.day != assignment2.time_slot.day or
+                    assignment1.time_slot.hour != assignment2.time_slot.hour):
+                diff = (i, assignment2.room_id, assignment2.time_slot.day, assignment2.time_slot.hour)
+                differences.append(diff)
+        return differences
+
+    def apply_velocity(self, timetable, velocity):
+        new_timetable = copy.deepcopy(timetable)
+
+        for course_idx, room_id, day, hour in velocity:
+            # Check if the index is valid
+            if 0 <= course_idx < len(new_timetable.assignments):
+                # Check if room_id is valid
+                if 0 <= room_id < len(self.rooms):
+                    # Check if day and hour are valid
+                    if 0 <= day < NUM_DAYS and 0 <= hour < NUM_HOURS:
+                        new_time_slot = TimeSlot(day, hour)
+                        new_timetable.assignments[course_idx] = CourseAssignment(new_timetable.assignments[course_idx].course_id,new_timetable.assignments[course_idx].section_id,room_id, new_time_slot,new_timetable.assignments[course_idx].is_lab)
+        self.evaluate_timetable(new_timetable)
+        return new_timetable
+
+    def update_velocity(self, particle, w, c1, c2):
+        inertia = particle.velocity
+        cognitive = self.get_timetable_difference(particle.position, particle.best_position)
+        social = self.get_timetable_difference(particle.position, self.global_best_position)
+        if inertia:
+            inertia_sample_size = min(len(inertia), max(0, int(len(inertia) * w)))
+            inertia_sample = random.sample(inertia, inertia_sample_size) if inertia_sample_size > 0 else []
+        else:
+            inertia_sample = []
+        if cognitive:
+            cognitive_sample_size = min(len(cognitive), max(0, int(len(cognitive) * c1 * random.random())))
+            cognitive_sample = random.sample(cognitive, cognitive_sample_size) if cognitive_sample_size > 0 else []
+        else:
+            cognitive_sample = []
+        if social:
+            social_sample_size = min(len(social), max(0, int(len(social) * c2 * random.random())))
+            social_sample = random.sample(social, social_sample_size) if social_sample_size > 0 else []
+        else:
+            social_sample = []
+        new_velocity = list(set(inertia_sample + cognitive_sample + social_sample))
+        return new_velocity
+
+    def mutate_timetable(self, timetable):
+        new_timetable = copy.deepcopy(timetable)
+        if new_timetable.assignments:
+            idx = random.randint(0, len(new_timetable.assignments) - 1)
+            assignment = new_timetable.assignments[idx]
+            mutation_type = random.choice(['room', 'time', 'both'])
+            if mutation_type in ['room', 'both']:
+                suitable_rooms = [r for r in self.rooms if (r.room_type == "lab" if assignment.is_lab else r.room_type == "lecture")]
+                if suitable_rooms:
+                    new_room_id = random.choice(suitable_rooms).id
+                    assignment.room_id = new_room_id
+            if mutation_type in ['time', 'both']:
+                new_day = random.randint(0, NUM_DAYS - 1)
+                new_hour = random.randint(0, NUM_HOURS - 1)
+                assignment.time_slot = TimeSlot(new_day, new_hour)
+        self.evaluate_timetable(new_timetable)
+        return new_timetable
+
+    def crossover(self, timetable1, timetable2):
+        child = Timetable()
+        for i in range(len(timetable1.assignments)):
+            if random.random() < 0.5:
+                child.add_assignment(copy.deepcopy(timetable1.assignments[i]))
+            else:
+                child.add_assignment(copy.deepcopy(timetable2.assignments[i]))
+        self.evaluate_timetable(child)
+        return child
+
+    def tournament_selection(self, population, tournament_size):
+        tournament = random.sample(population, tournament_size)
+        return max(tournament, key=lambda x: x.fitness)
+
+    def run_pso(self, num_particles=POPULATION_SIZE, max_iterations=MAX_ITERATIONS, w=W, c1=C1, c2=C2):
+        particles = self.initialize_pso(num_particles)
+        self.avg_fitness_history = []
+        self.best_fitness_history = []
+        self.violation_history = []
+        fitness_list = []
+        for iteration in range(max_iterations):
+            current_fitness_values = [p.position.fitness for p in particles]
+            avg_fitness = sum(current_fitness_values) / len(current_fitness_values)
+            best_fitness = max(current_fitness_values)
+            fitness_list.append(self.global_best_fitness)
+            if len(fitness_list) >= 31:
+                last_four = fitness_list[-30:]
+                if all(x == last_four[0] for x in last_four):
+                    break
+            self.avg_fitness_history.append(avg_fitness)
+            self.best_fitness_history.append(self.global_best_fitness)
+            total_violations = {violation: 0 for violation in self.global_best_position.violations}
+            for p in particles:
+                for v_type, v_count in p.position.violations.items():
+                    total_violations[v_type] += v_count
+            avg_violations = {v_type: count / num_particles for v_type, count in total_violations.items()}
+            self.violation_history.append(avg_violations)
+            print(
+                f"Iteration {iteration}: Avg Fitness = {avg_fitness:.2f}, Best Fitness = {self.global_best_fitness:.2f}")
+            for particle in particles:
+                new_velocity = self.update_velocity(particle, w, c1, c2)
+                particle.velocity = new_velocity
+                new_position = self.apply_velocity(particle.position, particle.velocity)
+                particle.position = new_position
+                particle.update_personal_best()
+                if particle.best_fitness > self.global_best_fitness:
+                    self.global_best_position = copy.deepcopy(particle.best_position)
+                    self.global_best_fitness = particle.best_fitness
+        return self.global_best_position
+
+    def run_genetic_algorithm(self, population_size=POPULATION_SIZE, max_iterations=MAX_ITERATIONS,crossover_rate=CROSSOVER_RATE, mutation_rate=MUTATION_RATE,tournament_size=TOURNAMENT_SIZE):
+        population = [self.generate_random_timetable() for _ in range(population_size)]
+        self.avg_fitness_history = []
+        self.best_fitness_history = []
+        self.violation_history = []
+        best_solution = max(population, key=lambda x: x.fitness)
+        best_fitness = best_solution.fitness
+        fitnees_list = []
+        for generation in range(max_iterations):
+            if len(fitnees_list) >= 31:
+                last_four = fitnees_list[-30:]
+                if all(x == last_four[0] for x in last_four):
+                    break
+            new_population = []
+            current_fitness_values = [p.fitness for p in population]
+            avg_fitness = sum(current_fitness_values) / len(current_fitness_values)
+            best_fitness_current = max(current_fitness_values)
+            self.avg_fitness_history.append(avg_fitness)
+            self.best_fitness_history.append(best_fitness)
+            total_violations = {violation: 0 for violation in population[0].violations}
+            for p in population:
+                for v_type, v_count in p.violations.items():
+                    total_violations[v_type] += v_count
+            avg_violations = {v_type: count / population_size for v_type, count in total_violations.items()}
+            self.violation_history.append(avg_violations)
+            print(f"Generation {generation}: Avg Fitness = {avg_fitness:.2f}, Best Fitness = {best_fitness:.2f}" )
+            new_population.append(copy.deepcopy(best_solution))
+            while len(new_population) < population_size:
+                parent1 = self.tournament_selection(population, tournament_size)
+                parent2 = self.tournament_selection(population, tournament_size)
+                if random.random() < crossover_rate:
+                    child = self.crossover(parent1, parent2)
+                else:
+                    child = copy.deepcopy(parent1)
+                if random.random() < mutation_rate:
+                    child = self.mutate_timetable(child)
+                new_population.append(child)
+            population = new_population
+            current_best = max(population, key=lambda x: x.fitness)
+            fitnees_list.append(best_fitness)
+            if current_best.fitness > best_fitness:
+                best_solution = copy.deepcopy(current_best)
+                best_fitness = current_best.fitness
+        self.global_best_position = best_solution
+        self.global_best_fitness = best_fitness
+        return best_solution
+
+    def run_hybrid_algorithm(self, population_size=POPULATION_SIZE, max_iterations=MAX_ITERATIONS,
+                             w=W, c1=C1, c2=C2, crossover_rate=CROSSOVER_RATE, mutation_rate=MUTATION_RATE):
+        particles = self.initialize_pso(population_size)
+        self.avg_fitness_history = []
+        self.best_fitness_history = []
+        self.violation_history = []
+        fitness_list = []
+        for iteration in range(max_iterations):
+            current_fitness_values = [p.position.fitness for p in particles]
+            avg_fitness = sum(current_fitness_values) / len(current_fitness_values)
+            self.avg_fitness_history.append(avg_fitness)
+            self.best_fitness_history.append(self.global_best_fitness)
+            fitness_list.append(self.global_best_fitness)
+            if len(fitness_list) >= 31:
+                last_four = fitness_list[-30:]
+                if all(x == last_four[0] for x in last_four):
+                    break
+            total_violations = {violation: 0 for violation in self.global_best_position.violations}
+            for p in particles:
+                for v_type, v_count in p.position.violations.items():
+                    total_violations[v_type] += v_count
+            avg_violations = {v_type: count / population_size for v_type, count in total_violations.items()}
+            self.violation_history.append(avg_violations)
+
+            print(
+                f"Iteration {iteration}: Avg Fitness = {avg_fitness:.2f}, Best Fitness = {self.global_best_fitness:.2f}")
+
+            for i, particle in enumerate(particles):
+                if random.random() < 0.5:
+                    new_velocity = self.update_velocity(particle, w, c1, c2)
+                    particle.velocity = new_velocity
+                    new_position = self.apply_velocity(particle.position, particle.velocity)
+                    particle.position = new_position
+                else:
+                    other_idx = random.randint(0, population_size - 1)
+                    while other_idx == i:
+                        other_idx = random.randint(0, population_size - 1)
+                    other_particle = particles[other_idx]
+
+                    if random.random() < crossover_rate:
+                        new_position = self.crossover(particle.position, other_particle.position)
+                        particle.position = new_position
+
+                    if random.random() < mutation_rate:
+                        particle.position = self.mutate_timetable(particle.position)
+
+                particle.update_personal_best()
+
+                if particle.best_fitness > self.global_best_fitness:
+                    self.global_best_position = copy.deepcopy(particle.best_position)
+                    self.global_best_fitness = particle.best_fitness
+
+        return self.global_best_position
+
+    def visualize_timetable(self, timetable, title="Optimized Timetable"):
+        fig, ax = plt.subplots(figsize=(15, 10))
+        days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"]
+        hours = [f"{h}:00" for h in range(8, 8 + NUM_HOURS)]
+        grid = np.empty((NUM_DAYS, NUM_HOURS), dtype=object)
+        for i in range(NUM_DAYS):
+            for j in range(NUM_HOURS):
+                grid[i, j] = ""
+        colors = list(mcolors.TABLEAU_COLORS)
+        course_colors = {}
+        for assignment in timetable.assignments:
+            course_id = assignment.course_id
+            room_id = assignment.room_id
+            day = assignment.time_slot.day
+            hour = assignment.time_slot.hour
+            section_id = assignment.section_id
+            if course_id not in course_colors:
+                course_colors[course_id] = colors[course_id % len(colors)]
+            if 0 <= day < NUM_DAYS and 0 <= hour < NUM_HOURS:
+                session_type = "L" if not assignment.is_lab else "Lab"
+                current_content = grid[day, hour]
+                new_content = f"{current_content}\nC{course_id}-{section_id}{session_type}/R{room_id}" if current_content else f"C{course_id}-{section_id}{session_type}/R{room_id}"
+                grid[day, hour] = new_content
+        cell_colors = np.empty((NUM_DAYS, NUM_HOURS), dtype=object)
+        for day in range(NUM_DAYS):
+            for hour in range(NUM_HOURS):
+                content = grid[day, hour]
+                if content and "C" in content:
+                    first_course = int(content.split('\n')[0].split('C')[1].split('-')[0])
+                    cell_colors[day, hour] = course_colors[first_course]
+                else:
+                    cell_colors[day, hour] = 'white'
+        table = ax.table(
+            cellText=grid,
+            rowLabels=days,
+            colLabels=hours,
+            cellColours=cell_colors,
+            loc='center'
+        )
+
+        table.auto_set_font_size(False)
+        table.set_fontsize(8)
+        table.scale(1, 2)
+        ax.set_title(f"{title}\nFitness: {timetable.fitness:.2f}", fontsize=14)
+        ax.axis('off')
+        violations_text = "\n".join([f"{k}: {v}" for k, v in timetable.violations.items()])
+        ax.text(0.01, 0.01, f"Violations:\n{violations_text}", transform=ax.transAxes)
+        plt.tight_layout()
+        return fig, ax
+
+    def plot_fitness_progress(self):
+        fig, ax = plt.subplots(figsize=(10, 6))
+        iterations = range(len(self.avg_fitness_history))
+        ax.plot(iterations, self.avg_fitness_history, label='Average Fitness')
+        ax.plot(iterations, self.best_fitness_history, label='Best Fitness')
+        ax.set_xlabel('Iteration')
+        ax.set_ylabel('Fitness')
+        ax.set_title('Fitness Progress')
+        ax.legend()
+        plt.tight_layout()
+        return fig, ax
+
+    def plot_violations_progress(self):
+        fig, ax = plt.subplots(figsize=(10, 6))
+        iterations = range(len(self.violation_history))
+        violation_types = list(self.violation_history[0].keys())
+        for v_type in violation_types:
+            values = [v_dict[v_type] for v_dict in self.violation_history]
+            ax.plot(iterations, values, label=v_type)
+        ax.set_xlabel('Iteration')
+        ax.set_ylabel('Average Violations')
+        ax.set_title('Constraint Violations Progress')
+        ax.legend()
+        plt.tight_layout()
+        return fig, ax
+
+    def compare_algorithms(self, population_size=POPULATION_SIZE, max_iterations=MAX_ITERATIONS):
+        results = {}
+        print("Running PSO...")
+        start_time = time.time()
+        pso_result = self.run_pso(
+            num_particles=population_size,
+            max_iterations=max_iterations
+        )
+        pso_time = time.time() - start_time
+        results['PSO'] = {
+            'solution': pso_result,
+            'time': pso_time,
+            'fitness_history': self.best_fitness_history.copy(),
+            'violation_history': self.violation_history.copy()
+        }
+        print("\nRunning Genetic Algorithm...")
+        start_time = time.time()
+        ga_result = self.run_genetic_algorithm(
+            population_size=population_size,
+            max_iterations=max_iterations
+        )
+        ga_time = time.time() - start_time
+        results['GA'] = {
+            'solution': ga_result,
+            'time': ga_time,
+            'fitness_history': self.best_fitness_history.copy(),
+            'violation_history': self.violation_history.copy()
+        }
+        print("\nRunning Hybrid Algorithm...")
+        start_time = time.time()
+        hybrid_result = self.run_hybrid_algorithm(
+            population_size=population_size,
+            max_iterations=max_iterations
+        )
+        hybrid_time = time.time() - start_time
+        results['Hybrid'] = {
+            'solution': hybrid_result,
+            'time': hybrid_time,
+            'fitness_history': self.best_fitness_history.copy(),
+            'violation_history': self.violation_history.copy()
+        }
+
+        print("\nAlgorithm Comparison Results:")
+        print(f"{'Algorithm':<10} | {'Fitness':<10} | {'Time (s)':<10}")
+        print("-" * 35)
+        for algo, data in results.items():
+            print(f"{algo:<10} | {data['solution'].fitness:<10.2f} | {data['time']:<10.2f}")
+        return results
+#################################################################################################################################################################################################################################
+# Gui
+############
+class TimetablingGUI:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("University Timetabling System")
+        self.problem = UniversityTimetablingProblem()
+        self.current_solution = None
+        self.comparison_results = None
+        self.notebook = ttk.Notebook(root)
+        self.notebook.pack(fill=tk.BOTH, expand=True)
+        self.create_problem_tab()
+        self.create_solution_tab()
+        self.create_algorithm_tab()
+        self.create_comparison_tab()
+
+    def create_problem_tab(self):
+        tab = ttk.Frame(self.notebook)
+        self.notebook.add(tab, text="Problem Definition")
+        sub_notebook = ttk.Notebook(tab)
+        sub_notebook.pack(fill=tk.BOTH, expand=True)
+        rooms_frame = ttk.Frame(sub_notebook)
+        sub_notebook.add(rooms_frame, text="Rooms")
+        self.create_rooms_table(rooms_frame)
+        courses_frame = ttk.Frame(sub_notebook)
+        sub_notebook.add(courses_frame, text="Courses")
+        self.create_courses_table(courses_frame)
+        lecturers_frame = ttk.Frame(sub_notebook)
+        sub_notebook.add(lecturers_frame, text="Lecturers")
+        self.create_lecturers_table(lecturers_frame)
+        groups_frame = ttk.Frame(sub_notebook)
+        sub_notebook.add(groups_frame, text="Student Groups")
+        self.create_groups_table(groups_frame)
+
+    def create_solution_tab(self):
+        tab = ttk.Frame(self.notebook)
+        self.notebook.add(tab, text="Solution")
+        controls_frame = ttk.Frame(tab)
+        controls_frame.pack(fill=tk.X, padx=5, pady=5)
+        ttk.Label(controls_frame, text="Algorithm:").pack(side=tk.LEFT, padx=5)
+        self.algorithm_var = tk.StringVar(value="PSO")
+        algorithm_menu = ttk.OptionMenu(controls_frame, self.algorithm_var, "PSO", "PSO", "GA", "Hybrid")
+        algorithm_menu.pack(side=tk.LEFT, padx=5)
+        run_button = ttk.Button(controls_frame,text="Run Optimization",command=self.run_optimization)
+        run_button.pack(side=tk.LEFT, padx=5)
+        self.solution_frame = ttk.Frame(tab)
+        self.solution_frame.pack(fill=tk.BOTH, expand=True)
+        ttk.Label(self.solution_frame,text="Run an optimization algorithm to see the solution").pack(expand=True)
+
+    def create_algorithm_tab(self):
+        tab = ttk.Frame(self.notebook)
+        self.notebook.add(tab, text="Algorithm Progress")
+        self.progress_frame = ttk.Frame(tab)
+        self.progress_frame.pack(fill=tk.BOTH, expand=True)
+        ttk.Label(self.progress_frame,text="Algorithm progress will be shown here after running").pack(expand=True)
+
+    def create_comparison_tab(self):
+        tab = ttk.Frame(self.notebook)
+        self.notebook.add(tab, text="Algorithm Comparison")
+        controls_frame = ttk.Frame(tab)
+        controls_frame.pack(fill=tk.X, padx=5, pady=5)
+        compare_button = ttk.Button(controls_frame,text="Compare Algorithms",command=self.run_comparison)
+        compare_button.pack(pady=5)
+        self.comparison_frame = ttk.Frame(tab)
+        self.comparison_frame.pack(fill=tk.BOTH, expand=True)
+        ttk.Label(self.comparison_frame,text="Click 'Compare Algorithms' to see results").pack(expand=True)
+
+    def create_rooms_table(self, parent):
+        columns = ("ID", "Type", "Capacity", "Projector", "Computers")
+        tree = ttk.Treeview(parent, columns=columns, show="headings")
+        for col in columns:
+            tree.heading(col, text=col)
+            tree.column(col, width=100)
+        for room in self.problem.rooms:
+            tree.insert("", tk.END, values=(room.id,room.room_type,room.capacity,"Yes" if room.has_projector else "No","Yes" if room.has_computers else "No"))
+        scrollbar = ttk.Scrollbar(parent, orient=tk.VERTICAL, command=tree.yview)
+        tree.configure(yscroll=scrollbar.set)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        tree.pack(fill=tk.BOTH, expand=True)
+
+    def create_courses_table(self, parent):
+        columns = ("ID", "Name", "Lecturer", "Groups", "Duration", "Sections", "Lab", "Requirements")
+        tree = ttk.Treeview(parent, columns=columns, show="headings")
+        for col in columns:
+            tree.heading(col, text=col)
+            tree.column(col, width=100)
+        for course in self.problem.courses:
+            groups = ", ".join(str(g) for g in course.student_group_ids)
+            requirements = []
+            if course.requires_projector:
+                requirements.append("Projector")
+            if course.requires_computers:
+                requirements.append("Computers")
+            req_str = ", ".join(requirements) if requirements else "None"
+            tree.insert("", tk.END, values=(course.id,course.name,course.lecturer_id,groups,course.duration,course.num_sections,"Yes" if course.has_lab else "No",req_str))
+        scrollbar = ttk.Scrollbar(parent, orient=tk.VERTICAL, command=tree.yview)
+        tree.configure(yscroll=scrollbar.set)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        tree.pack(fill=tk.BOTH, expand=True)
+
+    def create_lecturers_table(self, parent):
+        columns = ("ID", "Name", "Courses")
+        tree = ttk.Treeview(parent, columns=columns, show="headings")
+        for col in columns:
+            tree.heading(col, text=col)
+            tree.column(col, width=150)
+        for lecturer in self.problem.lecturers:
+            courses_str = " || ".join(str(c) for c in lecturer.courses_name)
+            tree.insert("", tk.END, values=(lecturer.id,lecturer.name,courses_str))
+        scrollbar = ttk.Scrollbar(parent, orient=tk.VERTICAL, command=tree.yview)
+        tree.configure(yscroll=scrollbar.set)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        tree.pack(fill=tk.BOTH, expand=True)
+
+    def create_groups_table(self, parent):
+        columns = ("ID", "Name", "Size")
+        tree = ttk.Treeview(parent, columns=columns, show="headings")
+        for col in columns:
+            tree.heading(col, text=col)
+            tree.column(col, width=100)
+        for group in self.problem.student_groups:
+            tree.insert("", tk.END, values=(group.id,group.name,group.size))
+        scrollbar = ttk.Scrollbar(parent, orient=tk.VERTICAL, command=tree.yview)
+        tree.configure(yscroll=scrollbar.set)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        tree.pack(fill=tk.BOTH, expand=True)
+
+    def run_optimization(self):
+        algorithm = self.algorithm_var.get()
+        for widget in self.solution_frame.winfo_children():
+            widget.destroy()
+        running_label = ttk.Label(self.solution_frame,text=f"Running {algorithm} optimization...")
+        running_label.pack(expand=True)
+        self.root.update()
+        if algorithm == "PSO":
+            solution = self.problem.run_pso()
+        elif algorithm == "GA":
+            solution = self.problem.run_genetic_algorithm()
+        else:
+            solution = self.problem.run_hybrid_algorithm()
+        self.current_solution = solution
+        running_label.destroy()
+        self.show_solution()
+        self.show_algorithm_progress()
+
+    def show_solution(self):
+        for widget in self.solution_frame.winfo_children():
+            widget.destroy()
+        fig, _ = self.problem.visualize_timetable(self.current_solution)
+        canvas = FigureCanvasTkAgg(fig, master=self.solution_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+    def show_algorithm_progress(self):
+        for widget in self.progress_frame.winfo_children():
+            widget.destroy()
+
+        fig = Figure(figsize=(10, 8))
+        gs = fig.add_gridspec(2, 1)
+
+        # Plot fitness progress
+        ax1 = fig.add_subplot(gs[0, 0])
+        iterations = range(len(self.problem.avg_fitness_history))
+        ax1.plot(iterations, self.problem.avg_fitness_history, label='Average Fitness')
+        ax1.plot(iterations, self.problem.best_fitness_history, label='Best Fitness')
+        ax1.set_xlabel('Iteration')
+        ax1.set_ylabel('Fitness')
+        ax1.set_title('Fitness Progress')
+        ax1.legend()
+
+        # Plot violations progress
+        ax2 = fig.add_subplot(gs[1, 0])
+        if self.problem.violation_history:  # Check if there's any data
+            violation_types = list(self.problem.violation_history[0].keys())
+            iterations_violations = range(len(self.problem.violation_history))
+
+            for v_type in violation_types:
+                # Ensure we have the same number of points for each violation type
+                values = []
+                for v_dict in self.problem.violation_history:
+                    if v_type in v_dict:
+                        values.append(v_dict[v_type])
+                    else:
+                        values.append(0)  # Default value if missing
+
+                ax2.plot(iterations_violations, values, label=v_type)
+
+            ax2.set_xlabel('Iteration')
+            ax2.set_ylabel('Average Violations')
+            ax2.set_title('Constraint Violations Progress')
+            ax2.legend()
+
+        fig.tight_layout()
+        canvas = FigureCanvasTkAgg(fig, master=self.progress_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+    def run_comparison(self):
+        for widget in self.comparison_frame.winfo_children():
+            widget.destroy()
+        running_label = ttk.Label(self.comparison_frame,text="Running algorithm comparison...")
+        running_label.pack(expand=True)
+        self.root.update()
+        self.comparison_results = self.problem.compare_algorithms()
+        running_label.destroy()
+        self.show_comparison_results()
+
+    def show_comparison_results(self):
+        fig = Figure(figsize=(10, 8))
+        gs = fig.add_gridspec(2, 1)
+        ax1 = fig.add_subplot(gs[0, 0])
+        for algo, data in self.comparison_results.items():
+            ax1.plot(data['fitness_history'], label=algo)
+        ax1.set_xlabel('Iteration')
+        ax1.set_ylabel('Fitness')
+        ax1.set_title('Algorithm Comparison - Fitness')
+        ax1.legend()
+        ax2 = fig.add_subplot(gs[1, 0])
+        algorithms = list(self.comparison_results.keys())
+        times = [data['time'] for data in self.comparison_results.values()]
+        fitnesses = [data['solution'].fitness for data in self.comparison_results.values()]
+        ax2.axis('off')
+        cell_text = [[f"{t:.2f} s" for t in times],[f"{f:.2f}" for f in fitnesses]]
+        table = ax2.table(cellText=cell_text,rowLabels=["Time", "Fitness"],colLabels=algorithms,loc='center')
+        table.auto_set_font_size(False)
+        table.set_fontsize(12)
+        table.scale(1, 2)
+        fig.tight_layout()
+        canvas = FigureCanvasTkAgg(fig, master=self.comparison_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+#################################################################################################################################################################################################################################
+# Main Function
+############
+def main():
+    root = tk.Tk()
+    root.geometry("800x600")
+    gui = TimetablingGUI(root)
+    root.mainloop()
+if __name__ == "__main__":
+    main()
